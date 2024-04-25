@@ -28,7 +28,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     getSession().then((session: Session | null) => {
-      console.log(session);
       if (session) {
         // Use type assertion to add the 'token' property
         const sessionWithToken = session as CustomSession;
