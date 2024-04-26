@@ -1,4 +1,12 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
+
+import { Metadata } from 'next';
+
+const metadata: Metadata = {
+  title: 'Vault',
+}
 
 export default function Home() {
   return (
