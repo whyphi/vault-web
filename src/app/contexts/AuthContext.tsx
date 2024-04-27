@@ -15,6 +15,7 @@ interface AuthContextProps {
 interface CustomSession extends Session {
   token?: {
     isNewUser?: boolean;
+    roles?: string[];
     // Add other properties as needed
   };
 }
