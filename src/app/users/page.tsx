@@ -69,7 +69,7 @@ export default function Users() {
         className="flex flex-col flex-1 justify-center w-full"
       >
         {/* Card Component to show Onboarding Stats */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 mb-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-4 mb-4">
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="max-w-sm">Number of Users Onboarded</CardDescription>
@@ -102,6 +102,28 @@ export default function Users() {
             </CardHeader>
             <CardFooter>
               <Button disabled>Reset Onboarding</Button>
+            </CardFooter>
+          </Card>
+          <Card className="flex flex-col justify-between">
+            <CardHeader className="pb-3">
+              <CardTitle>Add Users</CardTitle>
+              <CardDescription className="max-w-lg text-balance leading-relaxed">
+                New members? Add them to the platform.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button disabled>Add User</Button>
+            </CardFooter>
+          </Card>
+          <Card className="flex flex-col justify-between">
+            <CardHeader className="pb-3">
+              <CardTitle>Delete Users</CardTitle>
+              <CardDescription className="max-w-lg text-balance leading-relaxed">
+                Is someone graduating? Delete them from the platform.
+              </CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button disabled>Delete User</Button>
             </CardFooter>
           </Card>
         </div>
