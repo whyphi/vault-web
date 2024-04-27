@@ -15,13 +15,18 @@ const client = new MongoClient(uri, {
   }
 });
 
-
+const isUserAdmin = (user: any) => {
+  return user.roles.includes("admin");
+}
 
 async function isValidUser(email: string) {
   await client.connect();
   const db = client.db("vault");
   const user = await db.collection('users').findOne({ email: email });
   try {
+    if (user) {
+      return isUserAdmin(user);
+    }
     return !!user;
   } catch (error) {
     console.error('Error checking email:', error);
@@ -69,12 +74,12 @@ const authOptions: AuthOptions = {
         const userInfo = await getUserInfo(token.email ?? '');
         // Destructure userInfo and add its properties to the top level of the token
         if (userInfo) {
-          const { _id, name, email, isNewUser, role } = userInfo;
+          const { _id, name, email, isNewUser, roles } = userInfo;
           token._id = _id;
           token.name = name;
           token.email = email;
           token.isNewUser = isNewUser;
-          token.role = role;
+          token.roles = roles;
         }
       }
 
@@ -83,12 +88,12 @@ const authOptions: AuthOptions = {
 
         // Destructure userInfo and add its properties to the top level of the token
         if (userInfo) {
-          const { _id, name, email, isNewUser, role } = userInfo;
+          const { _id, name, email, isNewUser, roles } = userInfo;
           token._id = _id;
           token.name = name;
           token.email = email;
           token.isNewUser = isNewUser;
-          token.role = role;
+          token.roles = roles;
         }
       }
       return token;
