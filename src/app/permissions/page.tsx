@@ -33,6 +33,14 @@ import { useAuth } from "../contexts/AuthContext"
 import React, { useState, useEffect, useCallback } from "react"
 import Loader from "@/components/Loader"
 
+import { AlertCircle } from "lucide-react"
+
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+
 export default function Permissions() {
 
   const { token } = useAuth();
@@ -41,6 +49,7 @@ export default function Permissions() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const roles = [
     {
@@ -70,13 +79,14 @@ export default function Permissions() {
   }
 
   const handleSubmit = (event: React.FormEvent) => {
+
     event.preventDefault()
     setIsSaving(true);
     const roles = mapRolesToArray(selectedUser.rolesMap)
     const body = JSON.stringify({
       roles,
     })
-    console.log(roles);
+
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members/${selectedUser._id}/roles`, {
       method: "PATCH",
       headers: {
@@ -85,17 +95,15 @@ export default function Permissions() {
       },
       body,
     })
-      .then((response) => response.json())
       .then(() => {
         setUsers((prevUsers: any) =>
           prevUsers.map((user: any) =>
             user._id === selectedUser._id ? { ...user, rolesMap: selectedUser.rolesMap, roles: roles } : user
           )
         )
-        console.log(users)
+
       })
-      .catch(console.error)
-      .finally(() => {
+      .then(() => {
         toast(`${selectedUser.name}'s roles have been updated`, {
           description: new Date().toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }),
           action: {
@@ -103,10 +111,18 @@ export default function Permissions() {
             onClick: () => ({}),
           },
         })
+      })
+      .catch((error) => {
+        toast.error(error, {
+          description: new Date().toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }),
+        });
+      })
+      .finally(() => {
         setSelectedUser(null);
         setIsSaving(false);
       })
   }
+
 
 
 
@@ -132,7 +148,14 @@ export default function Permissions() {
         setUsers(usersWithRoles);
         setIsLoading(false);
       })
-      .catch((error) => console.error("Error fetching listings:", error));
+      .catch((error) => {
+        setIsLoading(false);
+        console.error("Error fetching listings:", error);
+        toast.error(error, {
+          description: new Date().toLocaleString("en-US", { timeZone: "America/New_York", hour12: false }),
+        });
+      });
+
   }, []);
 
 
