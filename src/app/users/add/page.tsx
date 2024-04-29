@@ -119,7 +119,7 @@ export default function AddUser() {
                         <Input placeholder="Enter your name" {...field} />
                       </FormControl>
                       <FormDescription>
-                        This is your public display name.
+                        Enter the user's name.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
