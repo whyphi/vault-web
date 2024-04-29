@@ -1,8 +1,7 @@
 "use client"
 
 import { useAuth } from "../../contexts/AuthContext"
-import Loader from "@/components/Loader"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Slash } from "lucide-react"
 
 import {
@@ -37,9 +36,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 
-import { AgGridReact } from 'ag-grid-react'; // AG Grid Component
-import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
+import { toast } from "sonner"
+import { Toaster } from "@/components/ui/sonner"
 
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -60,9 +58,10 @@ const formSchema = z.object({
   }),
 })
 
+
 export default function AddUser() {
   const { token } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,14 +73,54 @@ export default function AddUser() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    setIsSubmitting(true);
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(values),
+    })
+      .then(async (response) => {
+        const responseJson = await response.json();
+        if (!response.ok) {
+          // if res.Message exists throw res.Message else throw statustext
+          const errorMessage = responseJson.Message || response.statusText;
+          throw new Error(errorMessage);
+        }
+        form.setValue("email", "")
+        form.setValue("roles", [])
+        setIsSubmitting(false);
+        toast(`${values.name} has been added.`, {
+          description: new Date().toLocaleString("en-US", {
+            timeZone: "America/New_York",
+            hour12: false,
+          }),
+          action: {
+            label: "Close",
+            onClick: () => ({}),
+          },
+        })
+      })
+      .catch((error) => {
+        setIsSubmitting(false);
+        toast.error(`Error adding user: ${error.message}`, {
+          action: {
+            label: "Close",
+            onClick: () => ({}),
+          },
+        })
+      })
   }
+
+
+
 
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+      <Toaster />
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -179,7 +218,7 @@ export default function AddUser() {
                 ))}
               </CardContent>
               <CardFooter className="border-t px-6 py-4">
-                <Button type="submit">Add User</Button>
+                <Button disabled={isSubmitting} type="submit">Add User</Button>
               </CardFooter>
             </form>
           </Form>
