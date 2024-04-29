@@ -3,6 +3,7 @@
 import { useAuth } from "../contexts/AuthContext"
 import Loader from "@/components/Loader"
 import { useState, useEffect } from "react"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 
@@ -112,7 +113,9 @@ export default function Users() {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button disabled>Add User</Button>
+              <Link href="/users/add">
+                <Button>Add User</Button>
+              </Link>
             </CardFooter>
           </Card>
           <Card className="flex flex-col justify-between">
