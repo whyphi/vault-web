@@ -11,7 +11,8 @@ import {
   Home,
   Menu,
   Users,
-  Siren
+  Siren,
+  BarChart3
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -94,6 +95,13 @@ export default function RootLayout({
                             <Siren className="h-4 w-4" />
                             Manage Permissions{" "}
                           </Link>
+                          <Link
+                            href="/monitoring"
+                            className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                          >
+                            <BarChart3 className="h-4 w-4" />
+                            Monitoring
+                          </Link>
                         </nav>
                       </div>
                     </div>
@@ -141,6 +149,13 @@ export default function RootLayout({
                               <Siren className="h-5 w-5" />
                               Manage Permissions{" "}
                             </Link>
+                            <Link
+                              href="/monitoring"
+                              className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                            >
+                              <BarChart3 className="h-5 w-5" />
+                              Monitoring
+                            </Link>
                           </nav>
                           <div className="mt-auto">
                           </div>
@@ -158,8 +173,8 @@ export default function RootLayout({
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>My Account</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>Settings</DropdownMenuItem>
-                          <DropdownMenuSeparator />
+                          {/* <DropdownMenuItem>Settings</DropdownMenuItem> */}
+                          {/* <DropdownMenuSeparator /> */}
                           <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/login' })}>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
