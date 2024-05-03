@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 
 async function getTopWebsitePages(apiKey: string, projectId: string) {
