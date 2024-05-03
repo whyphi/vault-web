@@ -39,7 +39,7 @@ export async function GET() {
   }
 
   const response = await fetch(
-    `https://app.posthog.com/api/projects/${projectId}/insights/`,
+    `https://us.posthog.com/api/projects/${projectId}/insights/`,
     {
       headers: {
         Authorization: `Bearer ${apiKey}`,
