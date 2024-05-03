@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from "next/server";
 
 async function getTopWebsitePages(apiKey: string, projectId: string) {
   const dashboardResponse = await fetch(
@@ -28,16 +28,12 @@ async function getTopWebsitePages(apiKey: string, projectId: string) {
   return topWebsitePagesResult;
 }
 
-export async function GET(
-  _: NextApiRequest,
-  res: NextApiResponse
-) {
+export async function GET() {
   const apiKey = process.env.POSTHOG_API_KEY
   const projectId = process.env.POSTHOG_PROJECT_ID
 
   if (!apiKey || !projectId) {
-    res.status(500).json({ error: 'Missing API key or project ID' })
-    return
+    return NextResponse.json({ error: 'Missing API key or project ID' }, { status: 500 })
   }
 
   const response = await fetch(
@@ -52,8 +48,7 @@ export async function GET(
   const data = await response.json()
 
   if (!data) {
-    res.status(500).json({ error: 'Failed to fetch insights' })
-    return
+    return NextResponse.json({ error: 'Failed to fetch insights' }, { status: 500 })
   }
 
   const insights = data.results.map((insight: any) => {
@@ -63,8 +58,7 @@ export async function GET(
   }).filter(Boolean)[0]
 
   if (!insights) {
-    res.status(500).json({ error: 'Failed to find insights' })
-    return
+    return NextResponse.json({ error: 'Failed to find insights' }, { status: 500 })
   }
 
   const topWebsitePages = await getTopWebsitePages(apiKey, projectId)
