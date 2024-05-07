@@ -24,8 +24,11 @@ export default function Users() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetch(`/api/insights`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/monitoring/visited-pages`, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((response) => response.json())
       .then((data) => {
