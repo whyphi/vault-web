@@ -2,7 +2,8 @@
 
 import { useAuth } from "../../contexts/AuthContext"
 import { useState, useEffect } from "react"
-import { Slash } from "lucide-react"
+import { Slash, XOctagonIcon } from "lucide-react"
+
 
 import {
   Breadcrumb,
@@ -62,9 +63,6 @@ export default function DeleteUser() {
 
     return (
       <>
-        <div className="flex items-center">
-          {/* <h1 className="text-lg font-semibold md:text-2xl">Add User</h1> */}
-        </div>
         <div className="flex flex-col gap-2 w-full">
           <Card>
             <CardHeader>
@@ -124,7 +122,7 @@ export default function DeleteUser() {
                                 }}
                               >
 
-                                {user.name}
+                                {user.name} <span className="text-neutral-500 dark:text-neutral-300">({user.email})</span>
                               </div>
                               <Separator className="" />
                             </>
@@ -141,8 +139,21 @@ export default function DeleteUser() {
                 </h4>
                 {selectedUsers.length > 0 ? (
                   selectedUsers.map((user) => (
-                    <div key={user._id} className="text-sm">
-                      {user.name}
+                    <div key={user._id} className="flex items-center mt-1">
+                      <button
+                        className="mr-2 focus:outline-none"
+                        onClick={() =>
+                          setSelectedUsers(
+                            selectedUsers.filter((u) => u._id !== user._id)
+                          )
+                        }
+                      >
+                        <XOctagonIcon className="w-4 h-4 text-red-400" />
+                      </button>
+                      <div className="text-sm flex items-center">
+                        {user.name}
+                        <span className="ml-2 text-neutral-500 dark:text-neutral-300">({user.email})</span>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -152,6 +163,7 @@ export default function DeleteUser() {
             </CardContent>
             <CardFooter>
               <Button
+                disabled={selectedUsers.length === 0}
               // loading={isSubmitting}
               // onClick={async () => {
               //   setIsSubmitting(true);
