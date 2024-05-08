@@ -126,7 +126,9 @@ export default function Users() {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button disabled>Delete User</Button>
+              <Link href="/users/delete">
+                <Button>Delete User</Button>
+              </Link>
             </CardFooter>
           </Card>
         </div>

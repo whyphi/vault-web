@@ -89,6 +89,7 @@ export default function AddUser() {
           const errorMessage = responseJson.Message || response.statusText;
           throw new Error(errorMessage);
         }
+        form.setValue("name", "")
         form.setValue("email", "")
         form.setValue("roles", [])
         setIsSubmitting(false);
