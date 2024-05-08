@@ -100,33 +100,26 @@ export default function DeleteUser() {
                         className="h-72"
                       >
                         <div className="p-4">
-                          {searchedUsers.map((user) => (
-                            <>
-                              <div
-                                key={user._id}
-                                className={
-                                  "py-2 text-sm cursor-pointer select-none hover:bg-neutral-100 hover:dark:bg-neutral-800 " +
-                                  (selectedUsers.some((u) => u._id === user._id)
-                                    ? "bg-neutral-300 dark:bg-neutral-700"
-                                    : "")
-                                }
-                                onClick={() => {
-                                  if (selectedUsers.some((u) => u._id === user._id)) {
-                                    setSelectedUsers(
-                                      selectedUsers.filter((u) => u._id !== user._id)
-                                    );
-                                  } else {
-                                    setSelectedUsers([...selectedUsers, user]);
+                          {searchedUsers
+                            .filter((user) => !selectedUsers.some((u) => u._id === user._id))
+                            .map((user) => (
+                              <>
+                                <div
+                                  key={user._id}
+                                  className={
+                                    "py-2 text-sm cursor-pointer select-none hover:bg-neutral-100 hover:dark:bg-neutral-800 "
                                   }
-                                  setSearchValue("");
-                                }}
-                              >
+                                  onClick={() => {
+                                    setSelectedUsers([...selectedUsers, user]);
+                                    setSearchValue("");
+                                  }}
+                                >
 
-                                {user.name} <span className="text-neutral-500 dark:text-neutral-300">({user.email})</span>
-                              </div>
-                              <Separator className="" />
-                            </>
-                          ))}
+                                  {user.name} <span className="text-neutral-500 dark:text-neutral-300">({user.email})</span>
+                                </div>
+                                <Separator className="" />
+                              </>
+                            ))}
                         </div>
                       </ScrollArea>
                     </div>
