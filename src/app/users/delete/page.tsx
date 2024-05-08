@@ -26,15 +26,19 @@ import {
 } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 
+import { useRouter } from "next/navigation"
+
 import Loader from "@/components/Loader"
 
 
 export default function DeleteUser() {
+  const router = useRouter();
   const { token } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -75,6 +79,7 @@ export default function DeleteUser() {
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col">
                   <Input
+                    disabled={isSubmitting}
                     type="text"
                     placeholder="Search users..."
                     className="flex-1 px-3 py-3 "
@@ -156,30 +161,28 @@ export default function DeleteUser() {
             </CardContent>
             <CardFooter>
               <Button
-                disabled={selectedUsers.length === 0}
-              // loading={isSubmitting}
-              // onClick={async () => {
-              //   setIsSubmitting(true);
-              //   try {
-              //     await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members/bulk-delete`, {
-              //       method: "DELETE",
-              //       headers: {
-              //         "Content-Type": "application/json",
-              //         Authorization: `Bearer ${token}`,
-              //       },
-              //       body: JSON.stringify(selectedUsers.map((user) => user._id)),
-              //     });
-              //     toast.success("Users deleted successfully");
-              //     setSelectedUsers([]);
-              //   } catch (error) {
-              //     console.error(error);
-              //     toast.error("Error deleting users:", error);
-              //   } finally {
-              //     setIsSubmitting(false);
-              //   }
-              // }}
+                disabled={selectedUsers.length === 0 || isSubmitting}
+                onClick={async () => {
+                  setIsSubmitting(true);
+                  try {
+                    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members`, {
+                      method: "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify(selectedUsers.map((user) => user._id)),
+                    });
+                  } catch (error) {
+                    setIsSubmitting(false);
+                    toast.error("Error deleting user: " + error);
+                    console.error(error);
+                  } finally {
+                    router.push("/users")
+                  }
+                }}
               >
-                Delete selected users
+                {isSubmitting ? "Deleting..." : "Delete selected users"}
               </Button>
             </CardFooter>
           </Card>
