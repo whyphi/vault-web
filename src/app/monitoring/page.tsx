@@ -3,24 +3,13 @@
 import { useAuth } from "../contexts/AuthContext"
 import Loader from "@/components/Loader"
 import { useState, useEffect } from "react"
-import Link from "next/link"
-
-import { Button } from "@/components/ui/button"
-
 import { BarList, Card } from '@tremor/react';
-
-
-import { Progress } from "@/components/ui/progress";
-
-import { AgGridReact } from 'ag-grid-react'; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 
 export default function Users() {
   const { token } = useAuth();
-  const [users, setUsers] = useState<any[]>([])
   const [pages, setPages] = useState<any[]>([])
-  const [extended, setExtended] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -87,7 +76,6 @@ export default function Users() {
               </div> */}
             </Card>
           </>
-
         </div>
       </div>
     </main>
