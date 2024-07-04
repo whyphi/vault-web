@@ -72,7 +72,7 @@ export default function DeleteUser() {
             <CardHeader>
               <CardTitle>Delete User</CardTitle>
               <CardDescription>
-                Give a new user access to WhyPhi-related platforms and projects.
+                Select users to delete from WhyPhi. Any data deleted will be permanently deleted.
               </CardDescription>
             </CardHeader>
             <CardContent>
