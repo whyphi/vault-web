@@ -12,7 +12,8 @@ import {
   Menu,
   Users,
   Siren,
-  BarChart3
+  BarChart3,
+  Lock
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -92,7 +93,7 @@ export default function RootLayout({
                             href="/encrypt-application"
                             className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                           >
-                            <Users className="h-4 w-4" />
+                            <Lock className="h-4 w-4" />
                             Encrypt Application Data
                           </Link>
                           <Link
