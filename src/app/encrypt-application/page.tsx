@@ -9,11 +9,10 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 interface Listing {
   id: string;
   title: string;
-  active: boolean;
   deadline: string;
-  isEncrypted: boolean;
-  dateCreated: string;
-  isVisible: boolean;
+  is_encrypted: boolean;
+  date_created: string;
+  is_visible: boolean;
 }
 
 export default function Users() {
@@ -60,7 +59,7 @@ export default function Users() {
               <CardHeader className="flex justify-between">
                 <CardTitle className="text-2xl">{listing.title}</CardTitle>
                 <Switch
-                  checked={listing.isEncrypted ?? false}
+                  checked={listing.is_encrypted ?? false}
                   onCheckedChange={async () => {
                     try {
                       const response = await fetch(
@@ -76,7 +75,7 @@ export default function Users() {
                         setListings((prevListings) =>
                           prevListings.map((item) =>
                             item.id === listing.id
-                              ? { ...item, isEncrypted: !item.isEncrypted }
+                              ? { ...item, is_encrypted: !item.is_encrypted }
                               : item
                           )
                         );
