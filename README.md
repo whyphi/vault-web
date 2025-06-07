@@ -22,13 +22,11 @@ npm install -g n
 
 ## Project Overview
 
-
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
 To start the development server, run the following command:
-
 
 ```bash
 npm run dev
@@ -50,4 +48,5 @@ To learn more about Next.js, take a look at the following resources:
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
 ## Deployment
+
 This project is deployed using [Netlify](https://netlify.com/) and utilizes [Tailwind CSS](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/) components to create an attractive and responsive user interface.
