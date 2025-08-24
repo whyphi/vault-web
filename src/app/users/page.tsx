@@ -21,10 +21,11 @@ import { Progress } from "@/components/ui/progress";
 import { AgGridReact } from 'ag-grid-react'; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
+import { UserWithRoles } from "@/types/users"
 
 export default function Users() {
   const { token } = useAuth();
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<UserWithRoles[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Column Definitions: Defines the columns to be displayed.
@@ -35,10 +36,10 @@ export default function Users() {
     { field: "major" },
     { field: "minor" },
     { field: "team" },
-    { field: "graduationYear" },
+    { field: "grad_year" },
     { field: "family" },
-    { field: "isEboard" },
-    { field: "isNewUser" },
+    { field: "is_eboard" },
+    { field: "is_new_user" },
     { field: "class" },
   ]);
 
@@ -75,7 +76,7 @@ export default function Users() {
             <CardHeader className="pb-2">
               <CardDescription className="max-w-sm">Number of Users Onboarded</CardDescription>
               <CardTitle className="text-4xl">
-                {users.filter((user) => user.isNewUser === false && user.isNewUser !== undefined).length}
+                {users.filter((user) => user.is_new_user === false && user.is_new_user !== undefined).length}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -87,7 +88,7 @@ export default function Users() {
               <Progress
                 value={
                   (users.filter(
-                    (user) => user.isNewUser === false && user.isNewUser !== undefined
+                    (user) => user.is_new_user === false && user.is_new_user !== undefined
                   ).length / users.length) * 100
                 }
                 aria-label="Percentage of Members who have completed onboarding"
