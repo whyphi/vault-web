@@ -71,7 +71,7 @@ export default function Permissions() {
     },
   ] as const
 
-  const filterByString = useCallback((user: any) => {
+  const filterByString = useCallback((user: UserWithRoles) => {
     return user.name.toLowerCase().includes(filterText.toLowerCase())
   }, [filterText])
 
@@ -240,14 +240,17 @@ export default function Permissions() {
                           id={role.name}
                           name={role.name}
                           checked={selectedUser.role_map[role.name]}
-                          onCheckedChange={(event) => {
-                            setSelectedUser((prev: any) => ({
-                              ...prev,
-                              role_map: {
-                                ...prev.role_map,
-                                [role.name]: event.valueOf(),
-                              },
-                            }))
+                          onCheckedChange={(checked) => {
+                            setSelectedUser((prev) => {
+                              if (!prev) return prev; 
+                              return {
+                                ...prev,
+                                role_map: {
+                                  ...prev.role_map,
+                                  [role.name]: Boolean(checked),
+                                },
+                              }
+                            })
                           }}
                         />
                         <label
