@@ -15,9 +15,12 @@ export interface User {
 
 export interface UserWithRoles extends User {
   user_roles: UserRole[];
+  role_map: Record<string, boolean>;
 }
 
 interface UserRole {
-  id: string;
-  name: string;
+  role: {
+    id: string;
+    name: string;
+  };
 }

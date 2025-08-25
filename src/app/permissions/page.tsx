@@ -40,32 +40,33 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
+import { UserWithRoles } from "@/types/users"
 
 export default function Permissions() {
 
   const { token } = useAuth();
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<UserWithRoles[]>([])
   const [filterText, setFilterText] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const roles = [
     {
-      id: "admin",
+      name: "admin",
       label: "Admin",
     },
     {
-      id: "eboard",
+      name: "eboard",
       label: "E-Board",
     },
     {
-      id: "member",
+      name: "member",
       label: "Member",
     },
     {
-      id: "recruitment",
+      name: "recruitment",
       label: "Recruitment",
     },
   ] as const
@@ -74,20 +75,27 @@ export default function Permissions() {
     return user.name.toLowerCase().includes(filterText.toLowerCase())
   }, [filterText])
 
-  const mapRolesToArray = (rolesMap: Record<string, boolean>) => {
-    return Object.keys(rolesMap).filter((role) => rolesMap[role])
+  const mapRolesToArray = (role_map: Record<string, boolean>) => {
+    return Object.keys(role_map).filter((role) => role_map[role])
   }
 
   const handleSubmit = (event: React.FormEvent) => {
 
     event.preventDefault()
+
+    if (!selectedUser) {
+      console.error("No user selected.");
+      return;
+    }
+
     setIsSaving(true);
-    const roles = mapRolesToArray(selectedUser.rolesMap)
+
+    const roles = mapRolesToArray(selectedUser.role_map)
     const body = JSON.stringify({
       roles,
     })
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members/${selectedUser._id}/roles`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members/${selectedUser.id}/roles`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -96,9 +104,9 @@ export default function Permissions() {
       body,
     })
       .then(() => {
-        setUsers((prevUsers: any) =>
-          prevUsers.map((user: any) =>
-            user._id === selectedUser._id ? { ...user, rolesMap: selectedUser.rolesMap, roles: roles } : user
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === selectedUser.id ? { ...user, role_map: selectedUser.role_map, roles: roles } : user
           )
         )
 
@@ -123,9 +131,6 @@ export default function Permissions() {
       })
   }
 
-
-
-
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members`, {
       method: "GET",
@@ -135,14 +140,14 @@ export default function Permissions() {
     })
       .then((response) => response.json())
       .then((data) => {
-        const usersWithRoles = data.map((user: any) => {
-          const rolesMap: { [key: string]: boolean } = {};
+        const usersWithRoles = data.map((user: UserWithRoles) => {
+          const role_map: { [key: string]: boolean } = {};
           roles.forEach((role) => {
-            rolesMap[role.id] = user.roles ? user.roles.includes(role.id) : false;
+            role_map[role.name] = user.user_roles.some((ur) => ur.role.name === role.name);
           });
           return {
             ...user,
-            rolesMap,
+            role_map,
           };
         });
         setUsers(usersWithRoles);
@@ -157,8 +162,6 @@ export default function Permissions() {
       });
 
   }, []);
-
-
 
   if (isLoading) {
     return <Loader />
@@ -207,10 +210,10 @@ export default function Permissions() {
                     <div className="flex flex-col justify-end">
                       <div className="ml-auto font-medium text-left">Roles</div>
                       <p className="text-sm text-muted-foreground">
-                        {user.roles && user.roles.map((role: string, index: number) => (
-                          <React.Fragment key={role}>
+                        {user.user_roles.map((user_role, index) => (
+                          <React.Fragment key={index}>
                             {index > 0 ? ', ' : ''}
-                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                            {user_role.role.name.charAt(0).toUpperCase() + user_role.role.name.slice(1)}
                           </React.Fragment>
                         ))}
                       </p>
@@ -232,23 +235,23 @@ export default function Permissions() {
                 <div className="py-4 flex flex-col">
                   {roles.map(role => {
                     return (
-                      <div key={role.id} className="flex items-center mb-3 gap-3">
+                      <div key={role.name} className="flex items-center mb-3 gap-3">
                         <Checkbox
-                          id={role.id}
-                          name={role.id}
-                          checked={selectedUser.rolesMap![role.id] || false}
+                          id={role.name}
+                          name={role.name}
+                          checked={selectedUser.role_map[role.name]}
                           onCheckedChange={(event) => {
                             setSelectedUser((prev: any) => ({
                               ...prev,
-                              rolesMap: {
-                                ...prev.rolesMap,
-                                [role.id]: event.valueOf(),
+                              role_map: {
+                                ...prev.role_map,
+                                [role.name]: event.valueOf(),
                               },
                             }))
                           }}
                         />
                         <label
-                          htmlFor={role.id}
+                          htmlFor={role.name}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           {role.label}
