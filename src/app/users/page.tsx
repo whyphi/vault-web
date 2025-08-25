@@ -22,6 +22,7 @@ import { AgGridReact } from 'ag-grid-react'; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import { UserWithRoles } from "@/types/users"
+import { ColDef } from "ag-grid-community"
 
 export default function Users() {
   const { token } = useAuth();
@@ -29,7 +30,7 @@ export default function Users() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Column Definitions: Defines the columns to be displayed.
-  const [colDefs, setColDefs] = useState([
+  const [colDefs, setColDefs] = useState<ColDef[]>([
     { field: "name", },
     { field: "email" },
     { field: "college" },
