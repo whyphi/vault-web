@@ -35,6 +35,7 @@ import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/navigation"
 
 import Loader from "@/components/Loader"
+import { UserWithRoles } from "@/types/users"
 
 
 export default function DeleteUser() {
@@ -42,7 +43,7 @@ export default function DeleteUser() {
   const { token } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<UserWithRoles[]>([])
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/members`, {
@@ -60,10 +61,10 @@ export default function DeleteUser() {
   }, []);
 
 
-  const DeleteUserComponent = ({ users }: { users: any }) => {
+  const DeleteUserComponent = ({ users }: { users: UserWithRoles[] }) => {
     const [searchValue, setSearchValue] = useState("")
-    const [searchedUsers, setSearchedUsers] = useState<any[]>([])
-    const [selectedUsers, setSelectedUsers] = useState<any[]>([])
+    const [searchedUsers, setSearchedUsers] = useState<UserWithRoles[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<UserWithRoles[]>([])
 
     return (
       <>
@@ -106,11 +107,11 @@ export default function DeleteUser() {
                       >
                         <div className="p-4">
                           {searchedUsers
-                            .filter((user) => !selectedUsers.some((u) => u._id === user._id))
+                            .filter((user) => !selectedUsers.some((u) => u.id === user.id))
                             .map((user) => (
                               <>
                                 <div
-                                  key={user._id}
+                                  key={user.id}
                                   className={
                                     "py-2 text-sm cursor-pointer select-none hover:bg-neutral-100 hover:dark:bg-neutral-800 "
                                   }
@@ -137,12 +138,12 @@ export default function DeleteUser() {
                 </h4>
                 {selectedUsers.length > 0 ? (
                   selectedUsers.map((user) => (
-                    <div key={user._id} className="flex items-center mt-1">
+                    <div key={user.id} className="flex items-center mt-1">
                       <button
                         className="mr-2 focus:outline-none"
                         onClick={() =>
                           setSelectedUsers(
-                            selectedUsers.filter((u) => u._id !== user._id)
+                            selectedUsers.filter((u) => u.id !== user.id)
                           )
                         }
                       >
@@ -171,7 +172,7 @@ export default function DeleteUser() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                       },
-                      body: JSON.stringify(selectedUsers.map((user) => user._id)),
+                      body: JSON.stringify(selectedUsers.map((user) => user.id)),
                     });
                   } catch (error) {
                     setIsSubmitting(false);

@@ -1,53 +1,73 @@
-import NextAuth, { AuthOptions } from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
-import { MongoClient, ServerApiVersion } from 'mongodb'
+import { supabase } from "@/lib/supabase";
+import NextAuth, { AuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
-const mongoUser = process.env.MONGO_USER;
-const mongoPassword = process.env.MONGO_PASSWORD;
-const uri = `mongodb+srv://${mongoUser}:${mongoPassword}@cluster0.9gtht.mongodb.net/?retryWrites=true&w=majority`;
-
-
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
+declare module "next-auth" {
+  interface Session {
+    token: {
+      id: string;
+      email: string;
+      name: string;
+      is_new_user: boolean;
+      roles: string[];
+    };
   }
-});
 
-const isUserAdmin = (user: any) => {
-  return user.roles.includes("admin");
-}
-
-async function isValidUser(email: string) {
-  await client.connect();
-  const db = client.db("vault");
-  const user = await db.collection('users').findOne({ email: email });
-  try {
-    if (user) {
-      return isUserAdmin(user);
-    }
-    return !!user;
-  } catch (error) {
-    console.error('Error checking email:', error);
-    return false;
-  } finally {
-    await client.close();
+  interface JWT {
+    id: string;
+    email: string;
+    name: string;
+    is_new_user: boolean;
+    roles: string[];
   }
 }
+
+const isUserAdmin = (roles: string[]): boolean => {
+  return roles.includes("admin");
+};
 
 async function getUserInfo(email: string) {
-  await client.connect();
-  const db = client.db("vault");
-  const user = await db.collection('users').findOne({ email: email });
-  try {
-    return user || null;
-  } catch (error) {
-    console.error('Error checking email:', error);
+  const { data, error } = await supabase
+    .from("users")
+    .select(
+      `
+      id,
+      email,
+      name,
+      is_new_user,
+      user_roles (
+        roles (
+          name
+        )
+      )
+    `
+    )
+    .eq("email", email)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user info:", error);
     return null;
-  } finally {
-    await client.close();
   }
+
+  if (!data) return null;
+
+  const roles =
+    data.user_roles?.map((ur: any) => ur.roles?.name).filter(Boolean) ?? [];
+
+  return {
+    id: data.id,
+    email: data.email,
+    name: data.name,
+    is_new_user: data.is_new_user,
+    roles,
+  };
+}
+
+async function isValidAdmin(email: string) {
+  const userInfo = await getUserInfo(email);
+  if (!userInfo) return false;
+  return isUserAdmin(userInfo.roles);
 }
 
 const authOptions: AuthOptions = {
@@ -55,7 +75,7 @@ const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    })
+    }),
   ],
   events: {
     createUser: async ({ user }) => {
@@ -64,52 +84,58 @@ const authOptions: AuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      if (profile) {
-        return await isValidUser(profile.email as string);
+      if (profile?.email) {
+        return await isValidAdmin(profile.email);
       }
-      return true
+      return true;
     },
     async jwt({ token, trigger, account, profile, session }) {
       if (trigger === "update" && token) {
-        const userInfo = await getUserInfo(token.email ?? '');
+        const userInfo = await getUserInfo(token.email ?? "");
         // Destructure userInfo and add its properties to the top level of the token
         if (userInfo) {
-          const { _id, name, email, isNewUser, roles } = userInfo;
-          token._id = _id;
+          const { id, name, email, is_new_user, roles } = userInfo;
+          token.id = id;
           token.name = name;
           token.email = email;
-          token.isNewUser = isNewUser;
+          token.is_new_user = is_new_user;
           token.roles = roles;
         }
       }
 
       if (profile) {
-        const userInfo = await getUserInfo(profile.email ?? '');
+        const userInfo = await getUserInfo(profile.email ?? "");
 
         // Destructure userInfo and add its properties to the top level of the token
         if (userInfo) {
-          const { _id, name, email, isNewUser, roles } = userInfo;
-          token._id = _id;
+          const { id, name, email, is_new_user, roles } = userInfo;
+          token.id = id;
           token.name = name;
           token.email = email;
-          token.isNewUser = isNewUser;
+          token.is_new_user = is_new_user;
           token.roles = roles;
         }
       }
       return token;
     },
-    async session({ session, user, token }) {
-      (session as any).token = token; // Type assertion
+    async session({ session, token }) {
+      session.token = {
+        id: typeof token.id === "string" ? token.id : "",
+        email: typeof token.email === "string" ? token.email : "",
+        name: typeof token.name === "string" ? token.name : "",
+        is_new_user:
+          typeof token.is_new_user === "boolean" ? token.is_new_user : false,
+        roles: Array.isArray(token.roles) ? token.roles : [],
+      };
       return session;
     },
-
   },
   pages: {
-    error: "/authError"
+    error: "/authError",
   },
-  secret: process.env.NEXTAUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
