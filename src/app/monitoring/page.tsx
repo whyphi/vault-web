@@ -7,7 +7,7 @@ import { BarList, Card } from '@tremor/react';
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 
-export default function Users() {
+export default function Monitoring() {
   const { token } = useAuth();
   const [pages, setPages] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true);
